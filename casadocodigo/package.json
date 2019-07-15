@@ -1,6 +1,6 @@
 {
   "name": "casadocodigo",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "Livraria Casa do Codigo",
   "main": "server.js",
   "scripts": {

@@ -2,13 +2,11 @@ const LivroDao = require('../infra/LivroDao');
 const db = require('../../config/database');
 
 module.exports = (app) => {
-    app.get('/', function(request, response) {
-        response.marko(
-            require('../views/base/home/home.marko')
-        );
-    });
+
+    app.get('/', (request, response) =>
+        response.marko(require('../views/base/home/home.marko')));
     
-    app.get('/livros', function(request, response) {
+    app.get('/livros', (request, response) => {
 
         const livroDao = new LivroDao(db);
         livroDao.lista()
@@ -18,14 +16,23 @@ module.exports = (app) => {
                         livros: livros
                     }
                 ))
-                .catch(erro => console.log(erro));
+                .catch(error => console.log(error));
     });
 
-    app.get('/livros/form', function(request, response) {
-        response.marko(require('../views/livros/form/form.marko'), { livro: {} });
-    });
+    app.get('/livros/form', (request, response) => 
+        response.marko(require('../views/livros/form/form.marko'),
+        {
+            livro: {
+                id: '',
+                titulo: '',
+                preco: '',
+                descricao: ''
+            }
+        }
+    ));
 
-    app.get('/livros/form/:id', function(request, response) {
+    app.get('/livros/form/:id', (request, response) => {
+
         const id = request.params.id;
         const livroDao = new LivroDao(db);
 
@@ -36,33 +43,34 @@ module.exports = (app) => {
                         { livro: livro }
                     )
                 )
-                .catch(erro => console.log(erro));
+                .catch(error => console.log(error));
     });
 
-    app.post('/livros', function(request, response) {
-        console.log(request.body);
+    app.post('/livros', (request, response) => {
+        
         const livroDao = new LivroDao(db);
         
         livroDao.adiciona(request.body)
                 .then(response.redirect('/livros'))
-                .catch(erro => console.log(erro));
+                .catch(error => console.log(error));
     });
 
-    app.put('/livros', function(request, response) {
-        console.log(request.body);
+    app.put('/livros', (request, response) => {
+        
         const livroDao = new LivroDao(db);
         
         livroDao.atualiza(request.body)
                 .then(response.redirect('/livros'))
-                .catch(erro => console.log(erro));
+                .catch(error => console.log(error));
     });
 
-    app.delete('/livros/:id', function(request, response) {
+    app.delete('/livros/:id', (request, response) => {
+
         const id = request.params.id;
 
         const livroDao = new LivroDao(db);
         livroDao.remove(id)
                 .then(() => response.status(200).end())
-                .catch(erro => console.log(erro));
+                .catch(error => console.log(error));
     });
 };
