@@ -5,7 +5,8 @@ class BaseController {
     static routes() {
 
         return {
-            home: '/'
+            home: '/',
+            login: '/login'
         };
     }
 
@@ -13,6 +14,19 @@ class BaseController {
 
         return (request, response) =>
             response.marko(require(templates.base.home.path));
+    }
+
+    loginForm() {
+
+        return (request, response) => 
+            response.marko(require(templates.base.login.path));        
+    }
+
+    login() {
+
+        return (request, response) => {
+            
+        };
     }
 }
 

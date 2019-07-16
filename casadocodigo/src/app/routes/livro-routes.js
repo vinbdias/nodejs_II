@@ -3,7 +3,7 @@ const livroController = new LivroController();
 
 const Livro = require('../models/Livro');
 
-module.exports = (app) => {
+module.exports = app => {
 
     const livroRoutes = LivroController.routes();
 
