@@ -1,76 +1,37 @@
-const LivroDao = require('../infra/LivroDao');
-const db = require('../../config/database');
+const { check } = require('express-validator/check');
+
+const LivroController = require('../controllers/LivroController');
+const livroController = new LivroController();
+
+const BaseController = require('../controllers/BaseController');
+const baseController = new BaseController();
 
 module.exports = (app) => {
 
-    app.get('/', (request, response) =>
-        response.marko(require('../views/base/home/home.marko')));
+    const baseRoutes = BaseController.routes();
+    const livroRoutes = LivroController.routes();
+
+    app.get(baseRoutes.home, baseController.home());
     
-    app.get('/livros', (request, response) => {
+    app.get(livroRoutes.lista, livroController.lista());
 
-        const livroDao = new LivroDao(db);
-        livroDao.lista()
-                .then(livros => response.marko(
-                    require('../views/livros/lista/lista.marko'),
-                    {
-                        livros: livros
-                    }
-                ))
-                .catch(error => console.log(error));
-    });
+    app.get(livroRoutes.form, livroController.form());
 
-    app.get('/livros/form', (request, response) => 
-        response.marko(require('../views/livros/form/form.marko'),
-        {
-            livro: {
-                id: '',
-                titulo: '',
-                preco: '',
-                descricao: ''
-            }
-        }
-    ));
+    app.get(livroRoutes.formEdit, livroController.formEdit());
 
-    app.get('/livros/form/:id', (request, response) => {
+    app.post(livroRoutes.lista, 
+        [
+            check('titulo')
+                .isLength({ min: 5 })
+                .withMessage('O título precisa ter no mínimo 5 caracteres.'),
+            check('preco')
+                .isCurrency()
+                .withMessage('O preço precisa ter um valor monetário válido.')
+        ], 
+        livroController.save()
+    );
 
-        const id = request.params.id;
-        const livroDao = new LivroDao(db);
+    app.put(livroRoutes.lista, livroController.edit());
 
-        livroDao.buscaPorId(id)
-                .then(livro => 
-                    response.marko(
-                        require('../views/livros/form/form.marko'), 
-                        { livro: livro }
-                    )
-                )
-                .catch(error => console.log(error));
-    });
-
-    app.post('/livros', (request, response) => {
-        
-        const livroDao = new LivroDao(db);
-        
-        livroDao.adiciona(request.body)
-                .then(response.redirect('/livros'))
-                .catch(error => console.log(error));
-    });
-
-    app.put('/livros', (request, response) => {
-        
-        const livroDao = new LivroDao(db);
-        
-        livroDao.atualiza(request.body)
-                .then(response.redirect('/livros'))
-                .catch(error => console.log(error));
-    });
-
-    app.delete('/livros/:id', (request, response) => {
-
-        const id = request.params.id;
-
-        const livroDao = new LivroDao(db);
-        livroDao.remove(id)
-                .then(() => response.status(200).end())
-                .catch(error => console.log(error));
-    });
+    app.delete(livroRoutes.delete, livroController.delete());
 };
