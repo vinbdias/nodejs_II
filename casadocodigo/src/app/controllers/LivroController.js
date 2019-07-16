@@ -3,6 +3,8 @@ const { validationResult } = require('express-validator/check');
 const LivroDao = require('../infra/LivroDao');
 const db = require('../../config/database');
 
+const templates = require('../views/templates');
+
 class LivroController {
 
     static routes() {
@@ -11,19 +13,20 @@ class LivroController {
             lista: '/livros',
             form: '/livros/form',
             formEdit: '/livros/form/:id',
-            delete: '/livros/:id'            
+            delete: '/livros/:id',
+            detail: '/livros/detalhe/:id'          
         };
     }
 
 
     lista() {
 
-        return (request, response) => {
+        return (request, response) => {            
 
             const livroDao = new LivroDao(db);
             livroDao.lista()
                 .then(livros => response.marko(
-                    require('../views/livros/lista/lista.marko'),
+                    require(templates.livros.lista.path),
                     {
                         livros: livros
                     }
@@ -35,7 +38,7 @@ class LivroController {
     form() {
 
         return (request, response) =>
-            response.marko(require('../views/livros/form/form.marko'),
+            response.marko(require(templates.livros.form.path),
                 {
                     livro: {
                         id: '',
@@ -117,6 +120,24 @@ class LivroController {
                 .catch(error => console.log(error));
         };
     }
+
+    detail() {
+
+        return (request, response) => {
+
+            const id = request.params.id;
+            const livroDao = new LivroDao(db);
+
+            livroDao.buscaPorId(id)
+                .then(livro =>
+                    response.marko(
+                        require('../views/livros/detalhe/detalhe.marko'),
+                        { livro }
+                    )
+                )
+                .catch(error => console.log(error));
+        };
+    }    
 }
 
 module.exports = LivroController;

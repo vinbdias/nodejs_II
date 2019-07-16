@@ -1,3 +1,5 @@
+const templates = require('../views/templates');
+
 class BaseController {
 
     static routes() {
@@ -10,7 +12,7 @@ class BaseController {
     home() {
 
         return (request, response) =>
-            response.marko(require('../views/base/home/home.marko'));
+            response.marko(require(templates.base.home.path));
     }
 }
 
