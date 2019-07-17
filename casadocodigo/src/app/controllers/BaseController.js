@@ -1,5 +1,7 @@
 const templates = require('../views/templates');
 
+const LivroController = require('./LivroController');
+
 class BaseController {
 
     static routes() {
@@ -24,8 +26,26 @@ class BaseController {
 
     login() {
 
-        return (request, response) => {
-            
+        return (request, response, next) => {
+
+            const passport = request.passport;
+
+            passport.authenticate('local', (error, usuario, info) => {
+
+                if(info)
+                    return response.marko(templates.base.login.path);
+
+                if(error)
+                    return next(error);
+
+                request.login(usuario, error => {
+
+                    if(error)
+                        return next(error);
+
+                    return response.redirect(LivroController.routes().lista);
+                });
+            })(request, response, next);
         };
     }
 }

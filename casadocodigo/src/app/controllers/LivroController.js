@@ -10,6 +10,7 @@ class LivroController {
     static routes() {
 
         return {
+            autenticadas: '/livros*',
             lista: '/livros',
             form: '/livros/form',
             formEdit: '/livros/form/:id',

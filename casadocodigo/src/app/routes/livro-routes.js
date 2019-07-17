@@ -3,9 +3,19 @@ const livroController = new LivroController();
 
 const Livro = require('../models/Livro');
 
+const BaseController = require('../controllers/BaseController');
+
 module.exports = app => {
 
     const livroRoutes = LivroController.routes();
+
+    app.use(livroRoutes.autenticadas, (request, response, next) => {
+
+        if(request.isAuthenticated())
+            next();
+        else
+            response.redirect(BaseController.routes().login);
+    });
 
     app.get(livroRoutes.lista, livroController.lista());
 
